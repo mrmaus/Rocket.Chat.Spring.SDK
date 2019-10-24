@@ -1,0 +1,27 @@
+{
+  "msg": "changed",
+  "collection": "stream-room-messages",
+  "id": "id",
+  "fields": {
+    "eventName": "GENERAL",
+    "args": [
+      {
+        "_id": "pG9GunB9BDjCwxyKn",
+        "rid": "GENERAL",
+        "msg": "test2",
+        "ts": {
+          "$date": 1571257913307
+        },
+        "u": {
+          "_id": "s8Y9EpBRLJRaLg7Zr",
+          "username": "admin"
+        },
+        "mentions": [],
+        "channels": [],
+        "_updatedAt": {
+          "$date": 1571257913326
+        }
+      }
+    ]
+  }
+}
