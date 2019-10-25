@@ -24,6 +24,11 @@ https://rocket.chat/docs/developer-guides/realtime-api/
 The Realtime API based on Websocket and offers bi-directional exchange of messages between
 client and the server. 
 
+### Logging
+In order to get websocket protocol logs set the following property in application.properties file
+```
+logging.level.rocketchat.spring.ws.socket.ReactiveWebSocket=debug
+```
 
 ## REST API
 https://rocket.chat/docs/developer-guides/rest-api/
