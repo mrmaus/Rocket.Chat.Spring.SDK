@@ -26,11 +26,17 @@ public class RocketClientAutoConfiguration {
     this.applicationEventPublisher = applicationEventPublisher;
   }
 
-  @Bean
+  @Bean(destroyMethod = "stop")
   @ConditionalOnMissingBean
   public RealtimeClient realtimeClient() {
     final ReactorNettyWebSocketClient webSocketClient = new ReactorNettyWebSocketClient();
-    return new RealtimeClientImpl(webSocketClient, properties, applicationEventPublisher);
+    final RealtimeClientImpl client = new RealtimeClientImpl(webSocketClient, properties, applicationEventPublisher);
+
+    if (properties.isAutoStart()) {
+      client.start();
+    }
+
+    return client;
   }
 
   @Bean

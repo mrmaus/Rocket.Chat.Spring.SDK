@@ -20,6 +20,7 @@ import rocketchat.spring.ws.socket.WebSocket;
 import rocketchat.spring.ws.socket.WebSocketCallback;
 
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -50,6 +51,11 @@ public class RealtimeClientImpl implements RealtimeClient {
 
   private volatile SecurityContext securityContext;
 
+  /**
+   * Connection indicator
+   */
+  private AtomicBoolean connected = new AtomicBoolean(false);
+
   public RealtimeClientImpl(WebSocketClient webSocketClient,
                             ClientProperties properties,
                             ApplicationEventPublisher eventPublisher) {
@@ -61,6 +67,11 @@ public class RealtimeClientImpl implements RealtimeClient {
   @Override
   public void start() {
     socket.connect(properties.webSocketUri());
+  }
+
+  @Override
+  public void stop() {
+    socket.disconnect();
   }
 
   @Override
@@ -134,6 +145,9 @@ public class RealtimeClientImpl implements RealtimeClient {
 
     @Override
     public void connected(String sessionId) {
+      connected.set(true);
+
+      log.info("Connection established successfully");
 
       /* Initial connect message, has to be sent otherwise the server will close connection */
       send(Messages.connect());
@@ -179,8 +193,21 @@ public class RealtimeClientImpl implements RealtimeClient {
 
     @Override
     public void disconnected(String sessionId) {
-      log.info("Reconnecting..."); //todo: count reconnection attempts and apply delay
-      start();
+      connected.set(false);
+
+      int counter = 0;
+
+      while (!connected.get()) {
+        try {
+          Thread.sleep(10_000);
+        } catch (InterruptedException e) {
+          log.error("Connection thread interrupted", e);
+        }
+        if (!connected.get()) {
+          log.info("Reconnecting {} ...", ++counter);
+          start();
+        }
+      }
     }
   }
 

@@ -38,4 +38,4 @@ https://rocket.chat/docs/developer-guides/rest-api/
 * Better websocket reconnect implementation
 * Integration tests suite
 * Add examples
-* dedicated debug logger for network
+* dedicated debug logger for rest api network layer

@@ -101,15 +101,15 @@ public class ReactiveWebSocket implements WebSocket {
       final Flux<String> receive = session
           .receive()
           .map(WebSocketMessage::getPayloadAsText)
+          .publishOn(Schedulers.newElastic("incoming-messages-handler"))
           .doOnNext(message -> {
-            logger.debug("<<< {} - {}", Thread.currentThread().getName(), message);
+            logger.debug("<<< {}", message);
             callback.onMessage(message);
-          })
-          .subscribeOn(Schedulers.elastic());
+          });
 
       /* handles outgoing messages */
       final Flux<WebSocketMessage> send = Flux.from(sendProcessor)
-          .doOnNext(msg -> logger.debug(">>> {} - {}", Thread.currentThread().getName(), msg))
+          .doOnNext(msg -> logger.debug(">>> {}", msg))
           .map(session::textMessage);
       ////            .doOnError(AbortedException.class, t -> connectionClosed()) //todo:
 //            .doOnError(ClosedChannelException.class, t -> connectionClosed())

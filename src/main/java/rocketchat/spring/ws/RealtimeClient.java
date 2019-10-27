@@ -16,6 +16,11 @@ public interface RealtimeClient {
   void start();
 
   /**
+   * Disconnects the underlying socket
+   */
+  void stop();
+
+  /**
    * https://rocket.chat/docs/developer-guides/realtime-api/method-calls/get-subscriptions/
    * <p>
    * Retrieves list of subscriptions available to the current user. The consumer argument will be called once for each

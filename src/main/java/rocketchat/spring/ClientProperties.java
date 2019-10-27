@@ -27,6 +27,11 @@ public class ClientProperties {
    */
   private String password;
 
+  /**
+   * automatically start Realtime API connector on application startup
+   */
+  private boolean autoStart = true;
+
   public String getBaseUrl() {
     return baseUrl;
   }
@@ -49,6 +54,14 @@ public class ClientProperties {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public boolean isAutoStart() {
+    return autoStart;
+  }
+
+  public void setAutoStart(boolean autoStart) {
+    this.autoStart = autoStart;
   }
 
   public URI webSocketUri() {

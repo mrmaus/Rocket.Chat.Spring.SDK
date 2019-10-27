@@ -1,6 +1,5 @@
 package rocketchat.spring.examples.simplebot;
 
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -21,10 +20,4 @@ public class SimpleBotApplication {
   public SubscriptionsManager subscriptionsManager(RealtimeClient client) {
     return new SubscriptionsManager(client);
   }
-
-  @Bean
-  public CommandLineRunner clientStarter(RealtimeClient client) {
-    return args -> client.start();
-  }
-
 }
