@@ -6,8 +6,8 @@
   <groupId>rocketchat</groupId>
   <artifactId>rocketchat-spring-sdk</artifactId>
 
-  <version>0.1-SNAPSHOT</version>
-  <name>demo</name>
+  <version>0.1</version>
+  <name>RocketChat SpringBoot SDK</name>
   <description>todo:</description>
 
   <properties>
