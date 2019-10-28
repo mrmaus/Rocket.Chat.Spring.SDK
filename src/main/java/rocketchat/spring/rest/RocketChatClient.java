@@ -12,7 +12,7 @@ public interface RocketChatClient {
    * <p>
    * https://rocket.chat/docs/developer-guides/rest-api/chat/postmessage
    */
-  PostMessage.Reply sendMessage(PostMessage message);
+  PostMessage.Reply postMessage(PostMessage message);
 
   /**
    * Retrieves channel details

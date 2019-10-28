@@ -4,11 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoProcessor;
+import reactor.netty.http.client.HttpClient;
 import rocketchat.spring.ClientProperties;
 import rocketchat.spring.rest.messages.*;
 
@@ -32,10 +34,11 @@ public class ReactiveRocketChatClientImpl implements ReactiveRocketChatClient {
    */
   private volatile SecurityContext securityContext;
 
-  public ReactiveRocketChatClientImpl(ClientProperties properties) {
+  public ReactiveRocketChatClientImpl(HttpClient httpClient, ClientProperties properties) {
     this.webClient = WebClient.builder()
         .baseUrl(properties.getBaseUrl())
         .filter(logRequest())
+        .clientConnector(new ReactorClientHttpConnector(httpClient))
         .build();
 
     final Login login = new Login();

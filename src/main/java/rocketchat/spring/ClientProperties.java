@@ -32,6 +32,11 @@ public class ClientProperties {
    */
   private boolean autoStart = true;
 
+  /**
+   * If set to true, all SSL warnings will be ignored (such as invalid or self-signed certificate)
+   */
+  private boolean ignoreSsl = false;
+
   public String getBaseUrl() {
     return baseUrl;
   }
@@ -62,6 +67,14 @@ public class ClientProperties {
 
   public void setAutoStart(boolean autoStart) {
     this.autoStart = autoStart;
+  }
+
+  public boolean isIgnoreSsl() {
+    return ignoreSsl;
+  }
+
+  public void setIgnoreSsl(boolean ignoreSsl) {
+    this.ignoreSsl = ignoreSsl;
   }
 
   public URI webSocketUri() {

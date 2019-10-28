@@ -105,6 +105,41 @@ public class PostMessage {
     this.attachments = attachments;
   }
 
+  public PostMessage roomId(String roomId) {
+    setRoomId(roomId);
+    return this;
+  }
+
+  public PostMessage channel(String channel) {
+    setChannel(channel);
+    return this;
+  }
+
+  public PostMessage text(String text) {
+    setText(text);
+    return this;
+  }
+
+  public PostMessage alias(String alias) {
+    setAlias(alias);
+    return this;
+  }
+
+  public PostMessage emoji(String emoji) {
+    setEmoji(emoji);
+    return this;
+  }
+
+  public PostMessage avatar(String avatar) {
+    setAvatar(avatar);
+    return this;
+  }
+
+  public PostMessage attachments(Attachment... attachments) {
+    setAttachments(attachments);
+    return this;
+  }
+
   @Override
   public String toString() {
     return "PostMessage{" +
@@ -329,6 +364,81 @@ public class PostMessage {
       this.fields = fields;
     }
 
+    public Attachment color(String color) {
+      setColor(color);
+      return this;
+    }
+
+    public Attachment text(String text) {
+      setText(text);
+      return this;
+    }
+
+    public Attachment thumbUrl(String thumbUrl) {
+      setThumbUrl(thumbUrl);
+      return this;
+    }
+
+    public Attachment messageLink(String messageLink) {
+      setMessageLink(messageLink);
+      return this;
+    }
+
+    public Attachment collapsed(boolean collapsed) {
+      setCollapsed(collapsed);
+      return this;
+    }
+
+    public Attachment authorName(String authorName) {
+      setAuthorName(authorName);
+      return this;
+    }
+
+    public Attachment authorLink(String authorLink) {
+      setAuthorLink(authorLink);
+      return this;
+    }
+
+    public Attachment authorIcon(String authorIcon) {
+      setAuthorIcon(authorIcon);
+      return this;
+    }
+
+    public Attachment title(String title) {
+      setTitle(title);
+      return this;
+    }
+
+    public Attachment titleLink(String titleLink) {
+      setTitleLink(titleLink);
+      return this;
+    }
+
+    public Attachment titleLinkDownload(boolean titleLinkDownload) {
+      setTitleLinkDownload(titleLinkDownload);
+      return this;
+    }
+
+    public Attachment imageUrl(String imageUrl) {
+      setImageUrl(imageUrl);
+      return this;
+    }
+
+    public Attachment audioUrl(String audioUrl) {
+      setAudioUrl(audioUrl);
+      return this;
+    }
+
+    public Attachment videoUrl(String videoUrl) {
+      setVideoUrl(videoUrl);
+      return this;
+    }
+
+    public Attachment fields(Field... fields) {
+      setFields(fields);
+      return this;
+    }
+
     @Override
     public String toString() {
       return "Attachment{" +
@@ -391,6 +501,21 @@ public class PostMessage {
 
       public void setValue(String value) {
         this.value = value;
+      }
+
+      public Field isShort(boolean isShort) {
+        setShort(isShort);
+        return this;
+      }
+
+      public Field title(String title) {
+        setTitle(title);
+        return this;
+      }
+
+      public Field value(String value) {
+        setValue(value);
+        return this;
       }
 
       @Override

@@ -16,7 +16,7 @@ public class RocketChatClientImpl implements RocketChatClient {
   }
 
   @Override
-  public PostMessage.Reply sendMessage(PostMessage message) {
+  public PostMessage.Reply postMessage(PostMessage message) {
     return reactiveClient.postMessage(Mono.just(message)).block();
   }
 
