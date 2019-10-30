@@ -109,7 +109,7 @@ public class Messages {
   /**
    * Initial 'connect' message https://rocket.chat/docs/developer-guides/realtime-api/
    */
-  static class ConnectMessage extends Message {
+  public static class ConnectMessage extends Message {
     private String version = "1";
     private String[] support = new String[]{"1"};
 

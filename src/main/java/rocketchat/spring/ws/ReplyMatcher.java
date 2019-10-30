@@ -17,14 +17,17 @@ class ReplyMatcher {
   private final Map<String, Consumer<JsonNode>> replyHandlers = new ConcurrentHashMap<>();
 
   void add(IdentityAware request, Consumer<JsonNode> replyHandler) {
-    final String id = request.getId();
+    add(request.getId(), replyHandler);
+  }
+
+  void add(String id, Consumer<JsonNode> replyHandler) {
     if (replyHandler != null && id != null) {
       this.replyHandlers.put(id, replyHandler);
     }
   }
 
   Optional<Consumer<JsonNode>> match(JsonNode json) {
-    if (replyHandlers.isEmpty()) {
+    if (replyHandlers.isEmpty() || json == null) {
       return Optional.empty();
     }
     final String id = json.hasNonNull("id") ? json.get("id").asText() : null;
@@ -45,11 +48,20 @@ class ReplyMatcher {
       }
     }
 
+    // matching initial connect message reply, unfortunately no better matching way available atm
+    if (isConnectReply(json)) {
+      return Optional.ofNullable(replyHandlers.remove("connect"));
+    }
+
     return Optional.empty();
   }
 
   private boolean isSubsReply(JsonNode json) {
     final String msg = JsonUtils.getMsg(json);
     return "ready".equals(msg) && json.hasNonNull("subs");
+  }
+
+  private boolean isConnectReply(JsonNode json) { //anyone knows better way to match connect reply...?
+    return json.size() == 1 && "0".equals(JsonUtils.getText(json, "server_id"));
   }
 }

@@ -2,9 +2,6 @@ package rocketchat.spring.examples.simplebot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import rocketchat.spring.ws.RealtimeClient;
-import rocketchat.spring.ws.SubscriptionsManager;
 
 @SpringBootApplication
 public class SimpleBotApplication {
@@ -13,11 +10,4 @@ public class SimpleBotApplication {
     SpringApplication.run(SimpleBotApplication.class, args);
   }
 
-  /**
-   * Automatically join and release subscription streams
-   */
-  @Bean
-  public SubscriptionsManager subscriptionsManager(RealtimeClient client) {
-    return new SubscriptionsManager(client);
-  }
 }

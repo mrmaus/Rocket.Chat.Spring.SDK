@@ -9,8 +9,10 @@ import java.net.URISyntaxException;
 /**
  * Configuration parameters for REST and realtime clients
  */
-@ConfigurationProperties(prefix = "rocketchat")
+@ConfigurationProperties(prefix = ClientProperties.PREFIX)
 public class ClientProperties {
+
+  static final String PREFIX = "rocketchat";
 
   /**
    * The RocketChat server base url (ex: http://localhost:3000)
@@ -36,6 +38,12 @@ public class ClientProperties {
    * If set to true, all SSL warnings will be ignored (such as invalid or self-signed certificate)
    */
   private boolean ignoreSsl = false;
+
+  /**
+   * Enables automatic management of subscriptions: bot will automatically subscribe to messages stream on each joined
+   * channel and unsubscribes accordingly
+   */
+  private boolean subscriptionManagerEnabled = false;
 
   public String getBaseUrl() {
     return baseUrl;
@@ -75,6 +83,14 @@ public class ClientProperties {
 
   public void setIgnoreSsl(boolean ignoreSsl) {
     this.ignoreSsl = ignoreSsl;
+  }
+
+  public boolean isSubscriptionManagerEnabled() {
+    return subscriptionManagerEnabled;
+  }
+
+  public void setSubscriptionManagerEnabled(boolean subscriptionManagerEnabled) {
+    this.subscriptionManagerEnabled = subscriptionManagerEnabled;
   }
 
   public URI webSocketUri() {

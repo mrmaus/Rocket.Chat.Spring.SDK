@@ -129,6 +129,11 @@ public class RealtimeClientImpl implements RealtimeClient {
 
       this.replyMatcher.add(identityAware, replyHandler);
     }
+
+    if (message instanceof Messages.ConnectMessage) {  //special handling for initial Connect message
+      this.replyMatcher.add("connect", replyHandler);
+    }
+
     final String msg = Messages.toJsonString(message);
 
     socket.send(msg);
@@ -150,19 +155,19 @@ public class RealtimeClientImpl implements RealtimeClient {
       log.info("Connection established successfully");
 
       /* Initial connect message, has to be sent otherwise the server will close connection */
-      send(Messages.connect());
+      send(Messages.connect(), connectReply -> {
 
-      /* Automatically login with provided credentials */
-      send(Messages.login(properties.getUser(), properties.getPassword()),
-          json -> {
-            if (json.hasNonNull("error")) {
-              throw new RuntimeException(JsonUtils.getText(json.get("error"), "message"));
-            }
-            setSecurityContext(SecurityContext.fromLoginResponse(json));
+        /* Automatically login with provided credentials */
+        send(Messages.login(properties.getUser(), properties.getPassword()),
+            json -> {
+              if (json.hasNonNull("error")) {
+                throw new RuntimeException(JsonUtils.getText(json.get("error"), "message"));
+              }
+              setSecurityContext(SecurityContext.fromLoginResponse(json));
 
-            eventPublisher.publishEvent(new ClientStartedEvent());
-
-          });
+              eventPublisher.publishEvent(new ClientStartedEvent());
+            });
+      });
     }
 
     @Override
@@ -171,23 +176,21 @@ public class RealtimeClientImpl implements RealtimeClient {
 
       final String msg = JsonUtils.getMsg(json);
 
-      if (msg != null) {
-        if ("ping".equals(msg)) {
-          socket.send(Messages.pong());
-          return;
-        }
+      if ("ping".equals(msg)) {
+        socket.send(Messages.pong());
+        return;
+      }
 
-        replyMatcher.match(json).ifPresent(consumer -> consumer.accept(json));
+      replyMatcher.match(json).ifPresent(consumer -> consumer.accept(json));
 
-        final RocketChatEvent event = Events.parse(json);
-        if (event != null) {
-          //todo: provide better implementation!
-          if (event instanceof UserAwareEvent &&
-              ((UserAwareEvent) event).getUser().getLogin().equals(properties.getUser())) {
-            return; //todo:
-          }
-          eventPublisher.publishEvent(event);
+      final RocketChatEvent event = Events.parse(json);
+      if (event != null) {
+        //todo: provide better implementation!
+        if (event instanceof UserAwareEvent &&
+            ((UserAwareEvent) event).getUser().getLogin().equals(properties.getUser())) {
+          return; //todo:
         }
+        eventPublisher.publishEvent(event);
       }
     }
 

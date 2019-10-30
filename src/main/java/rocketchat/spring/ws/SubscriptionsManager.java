@@ -46,6 +46,8 @@ public class SubscriptionsManager {
     }
   }
 
+  //todo: rework the implementation, doesn't look thread-safe for now
+  //      timestamp entries and implement cleanup to avoid potential memory leak
   private void add(String roomId, String subscriptionId) {
     final String existing = roomToSubscription.put(roomId, subscriptionId);
     if (existing != null) {
