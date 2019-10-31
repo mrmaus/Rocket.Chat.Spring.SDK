@@ -21,6 +21,11 @@ public interface RealtimeClient {
   void stop();
 
   /**
+   * @return true if client has successfully established connection; false otherwise
+   */
+  boolean isConnected();
+
+  /**
    * https://rocket.chat/docs/developer-guides/realtime-api/method-calls/get-subscriptions/
    * <p>
    * Retrieves list of subscriptions available to the current user. The consumer argument will be called once for each

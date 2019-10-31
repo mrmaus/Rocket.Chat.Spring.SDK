@@ -75,6 +75,11 @@ public class RealtimeClientImpl implements RealtimeClient {
   }
 
   @Override
+  public boolean isConnected() {
+    return connected.get();
+  }
+
+  @Override
   public void getSubscriptions(Consumer<Subscription> consumer) {
     send(Messages.joinedRooms(), jsonNode ->
         Parsers.GetSubscriptionsResponseParser.parse(jsonNode).forEach(consumer));
