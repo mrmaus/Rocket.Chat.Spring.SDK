@@ -1,6 +1,5 @@
 package rocketchat.spring.examples.simplebot;
 
-import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import rocketchat.spring.ws.RealtimeClient;
@@ -12,11 +11,6 @@ public class EventHandlers {
 
   public EventHandlers(RealtimeClient client) {
     this.client = client;
-  }
-
-  @EventListener(classes = ContextStartedEvent.class)
-  public void startClient() {
-    this.client.start();
   }
 
   /**

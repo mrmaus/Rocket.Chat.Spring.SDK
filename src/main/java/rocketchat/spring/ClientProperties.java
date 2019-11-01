@@ -30,11 +30,6 @@ public class ClientProperties {
   private String password;
 
   /**
-   * automatically start Realtime API connector on application startup
-   */
-  private boolean autoStart = true;
-
-  /**
    * If set to true, all SSL warnings will be ignored (such as invalid or self-signed certificate)
    */
   private boolean ignoreSsl = false;
@@ -68,15 +63,7 @@ public class ClientProperties {
   public void setPassword(String password) {
     this.password = password;
   }
-
-  public boolean isAutoStart() {
-    return autoStart;
-  }
-
-  public void setAutoStart(boolean autoStart) {
-    this.autoStart = autoStart;
-  }
-
+  
   public boolean isIgnoreSsl() {
     return ignoreSsl;
   }
