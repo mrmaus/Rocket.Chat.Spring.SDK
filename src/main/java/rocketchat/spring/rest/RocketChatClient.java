@@ -55,4 +55,11 @@ public interface RocketChatClient {
    * https://rocket.chat/docs/developer-guides/rest-api/users/create/
    */
   UserReply createUser(CreateUser message);
+
+  /**
+   * Update own profile and change password
+   * <p>
+   * https://rocket.chat/docs/developer-guides/rest-api/users/updateownbasicinfo/
+   */
+  UserReply updateOwnBasicInfo(UserBasicInfo message);
 }

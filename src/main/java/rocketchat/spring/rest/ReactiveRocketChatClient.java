@@ -52,9 +52,15 @@ public interface ReactiveRocketChatClient {
 
   /**
    * Creates new user
-   *
+   * <p>
    * https://rocket.chat/docs/developer-guides/rest-api/users/create/
    */
   Mono<UserReply> createUser(Mono<CreateUser> message);
 
+  /**
+   * Update own profile and change password
+   * <p>
+   * https://rocket.chat/docs/developer-guides/rest-api/users/updateownbasicinfo/
+   */
+  Mono<UserReply> updateOwnBasicInfo(Mono<UserBasicInfo> message);
 }

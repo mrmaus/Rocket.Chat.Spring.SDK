@@ -49,4 +49,9 @@ public class RocketChatClientImpl implements RocketChatClient {
   public UserReply createUser(CreateUser message) {
     return reactiveClient.createUser(Mono.just(message)).block();
   }
+
+  @Override
+  public UserReply updateOwnBasicInfo(UserBasicInfo message) {
+    return reactiveClient.updateOwnBasicInfo(Mono.just(message)).block();
+  }
 }

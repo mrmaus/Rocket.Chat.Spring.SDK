@@ -14,7 +14,12 @@ import reactor.netty.http.client.HttpClient;
 import rocketchat.spring.ClientProperties;
 import rocketchat.spring.rest.messages.*;
 
+import javax.xml.bind.DatatypeConverter;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -90,6 +95,26 @@ public class ReactiveRocketChatClientImpl implements ReactiveRocketChatClient {
     return doSecurePost("/api/v1/users.create", message, CreateUser.class, UserReply.class);
   }
 
+  @Override
+  public Mono<UserReply> updateOwnBasicInfo(Mono<UserBasicInfo> message) {
+    final Mono<Map> data = message.map(info -> {
+      final UserBasicInfo c = new UserBasicInfo(info);
+      c.setCurrentPassword(sha256hex(this.login.getPassword()));
+      return c;
+    }).map(info -> Collections.singletonMap("data", info));
+    return doSecurePost("/api/v1/users.updateOwnBasicInfo", data, Map.class, UserReply.class);
+  }
+
+  private static String sha256hex(String s) {
+    try {
+      final MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      final byte[] hash = digest.digest(s.getBytes(StandardCharsets.UTF_8));
+      return DatatypeConverter.printHexBinary(hash).toLowerCase();
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   private Mono<SecurityContext> securityContext() {
     if (this.securityContext == null) {
       return resetSecurityContext();
@@ -127,7 +152,12 @@ public class ReactiveRocketChatClientImpl implements ReactiveRocketChatClient {
                         .flatMap(context2 -> withSecurityHeaders(requestProvider, context2)
                             .retrieve().bodyToMono(replyClass));
                   }
-                  //todo: handle other response codes
+                  if (response.statusCode().is4xxClientError()) {
+                    return Mono.error(new ClientHttpException(response));
+                  }
+                  if (response.statusCode().is5xxServerError()) {
+                    return Mono.error(new ServerHttpException(response));
+                  }
                   return response.bodyToMono(replyClass);
                 }));
   }
