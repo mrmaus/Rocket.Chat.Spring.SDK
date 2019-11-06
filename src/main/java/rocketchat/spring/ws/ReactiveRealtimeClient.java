@@ -166,7 +166,11 @@ abstract class ReactiveRealtimeClient implements RealtimeClient, WebSocketCallba
             ((UserAwareEvent) event).getUser().getLogin().equals(properties.getUser())) {
           return; //todo:
         }
-        eventPublisher.publishEvent(event);
+        try {
+          eventPublisher.publishEvent(event);
+        } catch (Exception e) {
+          log.error("Event publish failed", e);
+        }
       }
     });
   }
