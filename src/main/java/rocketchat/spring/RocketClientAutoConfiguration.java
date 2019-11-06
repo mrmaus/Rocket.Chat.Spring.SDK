@@ -17,9 +17,11 @@ import rocketchat.spring.rest.RocketChatClient;
 import rocketchat.spring.rest.RocketChatClientImpl;
 import rocketchat.spring.ws.RealtimeClient;
 import rocketchat.spring.ws.RealtimeClientImpl;
+import rocketchat.spring.ws.RealtimeExecutorFactory;
 import rocketchat.spring.ws.SubscriptionsManager;
 
 import javax.net.ssl.SSLException;
+import java.util.concurrent.Executors;
 
 @Configuration
 @EnableConfigurationProperties(ClientProperties.class)
@@ -50,11 +52,17 @@ public class RocketClientAutoConfiguration {
     return HttpClient.create();
   }
 
+  @Bean
+  @ConditionalOnMissingBean
+  public RealtimeExecutorFactory realtimeExecutorFactory() {
+    return () -> Executors.newFixedThreadPool(10);
+  }
+
   @Bean(destroyMethod = "stop")
   @ConditionalOnMissingBean
-  public RealtimeClient realtimeClient() {
+  public RealtimeClient realtimeClient(RealtimeExecutorFactory realtimeExecutorFactory) {
     final ReactorNettyWebSocketClient webSocketClient = new ReactorNettyWebSocketClient(httpClient());
-    return new RealtimeClientImpl(webSocketClient, properties, applicationEventPublisher);
+    return new RealtimeClientImpl(webSocketClient, properties, applicationEventPublisher, realtimeExecutorFactory);
   }
 
   @Bean

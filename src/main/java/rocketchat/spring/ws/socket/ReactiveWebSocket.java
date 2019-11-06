@@ -9,9 +9,7 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 import org.springframework.web.reactive.socket.client.WebSocketClient;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.UnicastProcessor;
 import reactor.core.scheduler.Schedulers;
 
 import java.net.URI;
@@ -78,43 +76,26 @@ public class ReactiveWebSocket implements WebSocket {
   private static class ReactiveWebSocketConnection implements WebSocketHandler {
     private final WebSocketCallback callback;
 
-    /**
-     * Gateway for all outgoing messages
-     */
-    private final UnicastProcessor<String> sendProcessor = UnicastProcessor.create();
-
-    /**
-     * Sink for sendProcessor to manually introduce messages to the pipeline
-     */
-    private final FluxSink<String> sendSink = sendProcessor.sink();
-
     private boolean webSocketConnected;
+
+    private WebSocketSession session;
 
     private ReactiveWebSocketConnection(WebSocketCallback callback) {
       this.callback = callback;
     }
 
     @Override
-    public Mono<Void> handle(WebSocketSession session) { //todo: fix schedulers issue
+    public Mono<Void> handle(WebSocketSession session) {
+      this.session = session;
 
       /* handles incoming messages */
       final Flux<String> receive = session
           .receive()
           .map(WebSocketMessage::getPayloadAsText)
-          .publishOn(Schedulers.newElastic("incoming-messages-handler"))
           .doOnNext(message -> {
             logger.debug("<<< {}", message);
             callback.onMessage(message);
           });
-
-      /* handles outgoing messages */
-      final Flux<WebSocketMessage> send = Flux.from(sendProcessor)
-          .doOnNext(msg -> logger.debug(">>> {}", msg))
-          .map(session::textMessage);
-      ////            .doOnError(AbortedException.class, t -> connectionClosed()) //todo:
-//            .doOnError(ClosedChannelException.class, t -> connectionClosed())
-//            .onErrorResume(ClosedChannelException.class, t -> Mono.empty())
-////            .onErrorResume(AbortedException.class, t -> Mono.empty()) //todo:
 
       final Mono<Object> connected = Mono.fromRunnable(() -> {
         webSocketConnected = true;
@@ -123,19 +104,22 @@ public class ReactiveWebSocket implements WebSocket {
 
       final Mono<Object> disconnected = Mono.fromRunnable(() -> {
         webSocketConnected = false;
-//        disconnectedProcessor.onNext(session);
         callback.disconnected(session.getId());
       });
 
       return connected
-          .thenMany(Flux.merge(receive, session.send(send)))
+          .thenMany(receive)
           .then(disconnected)
           .then();
     }
 
     void send(String message) {
       if (webSocketConnected) {
-        sendSink.next(message);
+        logger.debug(">>> {}", message);
+        
+        session
+            .send(Mono.just(session.textMessage(message)))
+            .subscribe();
       }
     }
 
