@@ -61,4 +61,20 @@ public interface RealtimeClient {
    * Cancel previously created listening stream with the specified ID
    */
   void cancelStream(String id);
+
+  /**
+   * Creates new DirectMessage https://rocket.chat/docs/developer-guides/realtime-api/method-calls/create-direct-message/
+   * The method itself doesn't send any message, but rather creates 'direct' chatroom and returns the room ID, which can
+   * be used to send direct message. It is safe to call this method many times for the same user, the server will return
+   * same RoomID in this case.
+   * <p>
+   * Example of sending direct message:
+   * <pre>
+   *         client.createDirectMessage("user_login", roomID ->
+   *           client.sendMessage(roomID, "hello world!"));
+   * </pre>
+   *
+   * @param login the user login to send message to
+   */
+  void createDirectMessage(String login, Consumer<String> roomId);
 }

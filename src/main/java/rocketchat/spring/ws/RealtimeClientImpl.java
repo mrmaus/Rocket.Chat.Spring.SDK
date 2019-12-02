@@ -7,9 +7,7 @@ import rocketchat.spring.model.Subscription;
 import rocketchat.spring.ws.messages.Messages;
 import rocketchat.spring.ws.messages.Parsers;
 
-import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * Default {@link RealtimeClient} implementation
@@ -56,5 +54,11 @@ public class RealtimeClientImpl extends ReactiveRealtimeClient {
   @Override
   public void cancelStream(String id) {
     send(Messages.unsubscribe(id));
+  }
+
+  @Override
+  public void createDirectMessage(String login, Consumer<String> roomId) {
+    send(Messages.createDirectMessage(login), json ->
+        roomId.accept(json.get("result").get("rid").asText()));
   }
 }

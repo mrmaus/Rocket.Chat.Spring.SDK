@@ -76,6 +76,13 @@ public class Messages {
   }
 
   /**
+   * Create Direct Message https://rocket.chat/docs/developer-guides/realtime-api/method-calls/create-direct-message/
+   */
+  public static Message createDirectMessage(String login) {
+    return new CreateDirectMessage(login);
+  }
+
+  /**
    * Serializes provided message to JSON as string
    */
   public static String toJsonString(Message message) {
@@ -205,4 +212,10 @@ public class Messages {
     }
   }
 
+  static class CreateDirectMessage extends MethodCall {
+    public CreateDirectMessage(final String login) {
+      setMethod("createDirectMessage");
+      setParams(new Object[]{login});
+    }
+  }
 }
