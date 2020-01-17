@@ -222,4 +222,8 @@ abstract class ReactiveRealtimeClient implements RealtimeClient, WebSocketCallba
   protected String userId() {
     return this.securityContext != null ? securityContext.userId : null;
   }
+
+  protected String username() {
+    return properties.getUser();
+  }
 }

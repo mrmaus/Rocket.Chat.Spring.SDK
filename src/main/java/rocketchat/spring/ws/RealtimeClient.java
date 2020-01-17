@@ -77,4 +77,16 @@ public interface RealtimeClient {
    * @param login the user login to send message to
    */
   void createDirectMessage(String login, Consumer<String> roomId);
+
+  /**
+   * Sends a typing event to the specified room ('user is typing...' note appears in the chat)
+   */
+  void startTyping(String roomId);
+
+  /**
+   * Removes typing event from the specified room
+   *
+   * @see #startTyping(String)
+   */
+  void stopTyping(String roomId);
 }

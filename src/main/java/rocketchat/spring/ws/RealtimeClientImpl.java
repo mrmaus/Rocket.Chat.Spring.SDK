@@ -6,6 +6,7 @@ import rocketchat.spring.ClientProperties;
 import rocketchat.spring.model.Subscription;
 import rocketchat.spring.ws.messages.Messages;
 import rocketchat.spring.ws.messages.Parsers;
+import rocketchat.spring.ws.messages.TypingMessage;
 
 import java.util.function.Consumer;
 
@@ -60,5 +61,15 @@ public class RealtimeClientImpl extends ReactiveRealtimeClient {
   public void createDirectMessage(String login, Consumer<String> roomId) {
     send(Messages.createDirectMessage(login), json ->
         roomId.accept(json.get("result").get("rid").asText()));
+  }
+
+  @Override
+  public void startTyping(String roomId) {
+    send(new TypingMessage(roomId, username(), true));
+  }
+
+  @Override
+  public void stopTyping(String roomId) {
+    send(new TypingMessage(roomId, username(), false));
   }
 }
