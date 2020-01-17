@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.reactive.socket.client.WebSocketClient;
 import rocketchat.spring.ClientProperties;
 import rocketchat.spring.ws.events.*;
@@ -43,7 +44,7 @@ abstract class ReactiveRealtimeClient implements RealtimeClient, WebSocketCallba
   /**
    * {@link ApplicationEventPublisher} that will be used to publish all {@link RocketChatEvent}
    */
-  private final ApplicationEventPublisher eventPublisher;
+  private final ConfigurableApplicationContext context;
 
   private final RealtimeExecutorFactory executorFactory;
 
@@ -61,10 +62,10 @@ abstract class ReactiveRealtimeClient implements RealtimeClient, WebSocketCallba
 
   ReactiveRealtimeClient(WebSocketClient webSocketClient,
                          ClientProperties properties,
-                         ApplicationEventPublisher eventPublisher,
+                         ConfigurableApplicationContext context,
                          RealtimeExecutorFactory executorFactory) {
     this.properties = properties;
-    this.eventPublisher = eventPublisher;
+    this.context = context;
     this.socket = new ReactiveWebSocket(webSocketClient, this);
     this.executorFactory = executorFactory;
   }
@@ -137,7 +138,7 @@ abstract class ReactiveRealtimeClient implements RealtimeClient, WebSocketCallba
             }
             setSecurityContext(SecurityContext.fromLoginResponse(json));
 
-            eventPublisher.publishEvent(new ClientStartedEvent());
+            context.publishEvent(new ClientStartedEvent());
           });
     });
   }
@@ -172,7 +173,7 @@ abstract class ReactiveRealtimeClient implements RealtimeClient, WebSocketCallba
         }
 
         try {
-          eventPublisher.publishEvent(event);
+          context.publishEvent(event);
         } catch (Exception e) {
           log.error("Event publish failed", e);
         }
@@ -182,23 +183,15 @@ abstract class ReactiveRealtimeClient implements RealtimeClient, WebSocketCallba
 
   @Override
   public void disconnected(String sessionId) {
+    log.warn("Bot disconnected! Closing application context and exiting...");
+
     connected.set(false);
 
-    messageHandlerService.shutdownNow();
-
-    int counter = 0;
-
-    while (!connected.get()) {
-      try {
-        Thread.sleep(10_000);
-      } catch (InterruptedException e) {
-        log.error("Connection thread interrupted", e);
-      }
-      if (!connected.get()) {
-        log.info("Reconnecting {} ...", ++counter);
-        start();
-      }
+    if (messageHandlerService != null) {
+      messageHandlerService.shutdownNow();
     }
+
+    context.close(); //closing ApplicationContext which usually should stop the Spring application
   }
 
 

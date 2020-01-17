@@ -21,7 +21,7 @@ import java.net.URI;
  * https://github.com/luis-moral/sample-webflux-websocket-netty
  */
 public class ReactiveWebSocket implements WebSocket {
-  private static final Logger logger = LoggerFactory.getLogger(ReactiveWebSocket.class);
+  private static final Logger log = LoggerFactory.getLogger(ReactiveWebSocket.class);
 
   private final WebSocketClient webSocketClient;
   private final WebSocketCallback callback;
@@ -50,6 +50,10 @@ public class ReactiveWebSocket implements WebSocket {
         webSocketClient
             .execute(uri, session)
             .subscribeOn(Schedulers.elastic())
+            .doOnError(e -> {
+              log.error("Failed to establish websocket connection", e);
+              callback.disconnected("");
+            })
             .subscribe();
   }
 
@@ -93,7 +97,7 @@ public class ReactiveWebSocket implements WebSocket {
           .receive()
           .map(WebSocketMessage::getPayloadAsText)
           .doOnNext(message -> {
-            logger.debug("<<< {}", message);
+            log.debug("<<< {}", message);
             callback.onMessage(message);
           });
 
@@ -115,8 +119,8 @@ public class ReactiveWebSocket implements WebSocket {
 
     void send(String message) {
       if (webSocketConnected) {
-        logger.debug(">>> {}", message);
-        
+        log.debug(">>> {}", message);
+
         session
             .send(Mono.just(session.textMessage(message)))
             .subscribe();

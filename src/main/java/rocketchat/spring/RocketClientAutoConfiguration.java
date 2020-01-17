@@ -5,7 +5,7 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
@@ -26,12 +26,11 @@ import java.util.concurrent.Executors;
 public class RocketClientAutoConfiguration {
 
   private final ClientProperties properties;
-  private final ApplicationEventPublisher applicationEventPublisher;
+  private final ConfigurableApplicationContext context;
 
-  public RocketClientAutoConfiguration(ClientProperties properties,
-                                       ApplicationEventPublisher applicationEventPublisher) {
+  public RocketClientAutoConfiguration(ClientProperties properties, ConfigurableApplicationContext context) {
     this.properties = properties;
-    this.applicationEventPublisher = applicationEventPublisher;
+    this.context = context;
   }
 
   @Bean
@@ -60,7 +59,7 @@ public class RocketClientAutoConfiguration {
   @ConditionalOnMissingBean
   public RealtimeClient realtimeClient(RealtimeExecutorFactory realtimeExecutorFactory) {
     final ReactorNettyWebSocketClient webSocketClient = new ReactorNettyWebSocketClient(httpClient());
-    return new RealtimeClientImpl(webSocketClient, properties, applicationEventPublisher, realtimeExecutorFactory);
+    return new RealtimeClientImpl(webSocketClient, properties, context, realtimeExecutorFactory);
   }
 
   @Bean

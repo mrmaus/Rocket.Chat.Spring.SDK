@@ -1,6 +1,7 @@
 package rocketchat.spring.ws;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.reactive.socket.client.WebSocketClient;
 import rocketchat.spring.ClientProperties;
 import rocketchat.spring.model.Subscription;
@@ -17,9 +18,9 @@ public class RealtimeClientImpl extends ReactiveRealtimeClient {
 
   public RealtimeClientImpl(WebSocketClient webSocketClient,
                             ClientProperties properties,
-                            ApplicationEventPublisher eventPublisher,
+                            ConfigurableApplicationContext context,
                             RealtimeExecutorFactory executorFactory) {
-    super(webSocketClient, properties, eventPublisher, executorFactory);
+    super(webSocketClient, properties, context, executorFactory);
   }
 
   @Override
