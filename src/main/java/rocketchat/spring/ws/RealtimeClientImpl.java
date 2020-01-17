@@ -43,13 +43,18 @@ public class RealtimeClientImpl extends ReactiveRealtimeClient {
   }
 
   @Override
-  public void streamPersonalMessages(Consumer<String> subscriptionId) {
+  public void streamMessages(Consumer<String> subscriptionId) {
     streamRoomMessages("__my_messages__", subscriptionId);
   }
 
   @Override
   public void streamSubscriptionChanges() {
     send(Messages.streamNotifyUser(userId(), "subscriptions-changed"));
+  }
+
+  @Override
+  public void streamRoomsChanges() {
+    send(Messages.streamNotifyUser(userId(), "rooms-changed"));
   }
 
   @Override

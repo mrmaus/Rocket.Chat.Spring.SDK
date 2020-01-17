@@ -6,10 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.reactive.socket.client.WebSocketClient;
 import rocketchat.spring.ClientProperties;
-import rocketchat.spring.ws.events.ClientStartedEvent;
-import rocketchat.spring.ws.events.Events;
-import rocketchat.spring.ws.events.RocketChatEvent;
-import rocketchat.spring.ws.events.UserAwareEvent;
+import rocketchat.spring.ws.events.*;
 import rocketchat.spring.ws.messages.IdentityAware;
 import rocketchat.spring.ws.messages.Message;
 import rocketchat.spring.ws.messages.Messages;
@@ -166,6 +163,14 @@ abstract class ReactiveRealtimeClient implements RealtimeClient, WebSocketCallba
             ((UserAwareEvent) event).getUser().getLogin().equals(properties.getUser())) {
           return; //todo:
         }
+
+        //todo:
+        if (event instanceof MessageEvent) {
+          if (!((MessageEvent) event).isRoomParticipant()) {
+            return; //todo: ignore messages from other rooms; controversial decision; maybe reconsider later...
+          }
+        }
+
         try {
           eventPublisher.publishEvent(event);
         } catch (Exception e) {

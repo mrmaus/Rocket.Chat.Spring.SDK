@@ -10,7 +10,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Automatically manages all subscriptions, subscribing to all active message streams and un-subscribing automatically
+ *
+ * @deprecated looks like just streaming personal messages would do the job
  */
+@Deprecated
 public class SubscriptionsManager {
 
   private final RealtimeClient client;

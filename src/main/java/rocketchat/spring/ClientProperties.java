@@ -37,6 +37,8 @@ public class ClientProperties {
   /**
    * Enables automatic management of subscriptions: bot will automatically subscribe to messages stream on each joined
    * channel and unsubscribes accordingly
+   *
+   * @deprecated
    */
   private boolean subscriptionManagerEnabled = false;
 
@@ -63,7 +65,7 @@ public class ClientProperties {
   public void setPassword(String password) {
     this.password = password;
   }
-  
+
   public boolean isIgnoreSsl() {
     return ignoreSsl;
   }

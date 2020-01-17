@@ -20,4 +20,23 @@ public class JsonUtils {
   public static String getMsg(JsonNode json) {
     return getText(json, "msg");
   }
+
+  /**
+   * Provides null-safe navigation through JSON nested structure
+   */
+  public static JsonNode navigate(JsonNode parent, String... children) {
+    if (parent == null || children == null) {
+      return null;
+
+    }
+    JsonNode node = parent;
+
+    for (String child : children) {
+      node = node.get(child);
+      if (node == null) {
+        return null;
+      }
+    }
+    return node;
+  }
 }

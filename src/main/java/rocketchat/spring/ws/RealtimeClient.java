@@ -46,9 +46,9 @@ public interface RealtimeClient {
   void streamRoomMessages(String roomId, Consumer<String> subscriptionId);
 
   /**
-   * Starts listening to personal messages feed
+   * Starts listening to all available messages feeds
    */
-  void streamPersonalMessages(Consumer<String> subscriptionId);
+  void streamMessages(Consumer<String> subscriptionId);
 
   /**
    * Starts listening to all subscription changes events (user invited to the room, user removed from the room, etc)
@@ -56,6 +56,13 @@ public interface RealtimeClient {
    * See 'subscriptions-changed' in https://rocket.chat/docs/developer-guides/realtime-api/subscriptions/stream-notify-user/
    */
   void streamSubscriptionChanges();
+
+  /**
+   * 'rooms-changed' event
+   * <p>
+   * https://rocket.chat/docs/developer-guides/realtime-api/subscriptions/stream-notify-user/
+   */
+  void streamRoomsChanges();
 
   /**
    * Cancel previously created listening stream with the specified ID

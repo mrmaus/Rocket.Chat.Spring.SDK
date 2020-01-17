@@ -4,7 +4,6 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +17,6 @@ import rocketchat.spring.rest.RocketChatClientImpl;
 import rocketchat.spring.ws.RealtimeClient;
 import rocketchat.spring.ws.RealtimeClientImpl;
 import rocketchat.spring.ws.RealtimeExecutorFactory;
-import rocketchat.spring.ws.SubscriptionsManager;
 
 import javax.net.ssl.SSLException;
 import java.util.concurrent.Executors;
@@ -75,11 +73,5 @@ public class RocketClientAutoConfiguration {
   @ConditionalOnMissingBean
   public RocketChatClient rocketChatClient(ReactiveRocketChatClient reactiveClient) {
     return new RocketChatClientImpl(reactiveClient);
-  }
-
-  @Bean
-  @ConditionalOnProperty(prefix = ClientProperties.PREFIX, name = "subscription-manager-enabled", matchIfMissing = false)
-  public SubscriptionsManager subscriptionsManager(RealtimeClient client) {
-    return new SubscriptionsManager(client);
   }
 }
