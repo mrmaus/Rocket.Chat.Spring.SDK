@@ -2,6 +2,7 @@ package rocketchat.spring.rest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -12,7 +13,9 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoProcessor;
 import reactor.netty.http.client.HttpClient;
 import rocketchat.spring.ClientProperties;
+import rocketchat.spring.model.IdOrName;
 import rocketchat.spring.rest.messages.*;
+import rocketchat.spring.rest.messages.reply.RoomInfoReply;
 
 import javax.xml.bind.DatatypeConverter;
 import java.net.URI;
@@ -54,24 +57,31 @@ public class ReactiveRocketChatClientImpl implements ReactiveRocketChatClient {
 
   @Override
   public Mono<PostMessage.Reply> postMessage(Mono<PostMessage> message) {
-    return doSecurePost("/api/v1/chat.postMessage", message, PostMessage.class, PostMessage.Reply.class);
+    return doSecurePost("/api/v1/chat.postMessage", message, PostMessage.class, ReplyType.of(PostMessage.Reply.class));
   }
 
   @Override
   public Mono<ChannelReply> channelInfo(ChannelInfo info) {
     return doSecureGet(b -> b.path("/api/v1/channels.info")
-        .queryParam(info.getFieldName(), info.getFieldValue()).build(), ChannelReply.class);
+        .queryParam(info.getFieldName(), info.getFieldValue()).build(), ReplyType.of(ChannelReply.class));
+  }
+
+  @Override
+  public Mono<RoomInfoReply> roomInfo(IdOrName token) {
+    return doSecureGet(b -> b.path("/api/v1/rooms.info")
+            .queryParam(token.isId() ? "roomId" : "roomName", token.getValue()).build(),
+        ReplyType.of(RoomInfoReply.class));
   }
 
   @Override
   public Mono<UserReply> userInfo(UserInfo info) {
     return doSecureGet(b -> b.path("/api/v1/users.info")
-        .queryParam(info.getFieldName(), info.getFieldValue()).build(), UserReply.class);
+        .queryParam(info.getFieldName(), info.getFieldValue()).build(), ReplyType.of(UserReply.class));
   }
 
   @Override
   public Mono<ChannelReply> createChannel(Mono<CreateChannel> message) {
-    return doSecurePost("/api/v1/channels.create", message, CreateChannel.class, ChannelReply.class);
+    return doSecurePost("/api/v1/channels.create", message, CreateChannel.class, ReplyType.of(ChannelReply.class));
   }
 
   @Override
@@ -79,7 +89,7 @@ public class ReactiveRocketChatClientImpl implements ReactiveRocketChatClient {
     final Map<String, String> message = new HashMap<>();
     message.put("roomId", roomId);
     message.put("userId", userId);
-    return doSecurePost("/api/v1/channels.invite", Mono.just(message), Map.class, ChannelReply.class);
+    return doSecurePost("/api/v1/channels.invite", Mono.just(message), Map.class, ReplyType.of(ChannelReply.class));
   }
 
   @Override
@@ -87,12 +97,12 @@ public class ReactiveRocketChatClientImpl implements ReactiveRocketChatClient {
     final Map<String, String> message = new HashMap<>(); //todo:
     message.put("roomId", roomId);
     message.put("userId", userId);
-    return doSecurePost("/api/v1/channels.kick", Mono.just(message), Map.class, ChannelReply.class);
+    return doSecurePost("/api/v1/channels.kick", Mono.just(message), Map.class, ReplyType.of(ChannelReply.class));
   }
 
   @Override
   public Mono<UserReply> createUser(Mono<CreateUser> message) {
-    return doSecurePost("/api/v1/users.create", message, CreateUser.class, UserReply.class);
+    return doSecurePost("/api/v1/users.create", message, CreateUser.class, ReplyType.of(UserReply.class));
   }
 
   @Override
@@ -102,7 +112,7 @@ public class ReactiveRocketChatClientImpl implements ReactiveRocketChatClient {
       c.setCurrentPassword(sha256hex(this.login.getPassword()));
       return c;
     }).map(info -> Collections.singletonMap("data", info));
-    return doSecurePost("/api/v1/users.updateOwnBasicInfo", data, Map.class, UserReply.class);
+    return doSecurePost("/api/v1/users.updateOwnBasicInfo", data, Map.class, ReplyType.of(UserReply.class));
   }
 
   private static String sha256hex(String s) {
@@ -131,17 +141,17 @@ public class ReactiveRocketChatClientImpl implements ReactiveRocketChatClient {
         ).doOnNext(context -> this.securityContext = context);
   }
 
-  private <REQ, RES> Mono<RES> doSecurePost(String uri, Mono<REQ> body, Class<REQ> requestClass, Class<RES> replyClass) {
+  private <REQ, RES> Mono<RES> doSecurePost(String uri, Mono<REQ> body, Class<REQ> requestClass, ReplyType<RES> replyType) {
     final Supplier<WebClient.RequestHeadersSpec<?>> requestProvider = () -> post(uri, body, requestClass);
-    return doExecute(replyClass, requestProvider);
+    return doExecute(replyType, requestProvider);
   }
 
-  private <RES> Mono<RES> doSecureGet(Function<UriBuilder, URI> uriFunction, Class<RES> replyClass) {
+  private <RES> Mono<RES> doSecureGet(Function<UriBuilder, URI> uriFunction, ReplyType<RES> replyType) {
     final Supplier<WebClient.RequestHeadersSpec<?>> requestProvider = () -> get(uriFunction);
-    return doExecute(replyClass, requestProvider);
+    return doExecute(replyType, requestProvider);
   }
 
-  private <RES> Mono<RES> doExecute(Class<RES> replyClass, Supplier<WebClient.RequestHeadersSpec<?>> requestProvider) {
+  private <RES> Mono<RES> doExecute(ReplyType<RES> replyType, Supplier<WebClient.RequestHeadersSpec<?>> requestProvider) {
     return
         securityContext()
             .flatMap(context -> withSecurityHeaders(requestProvider, context)
@@ -149,8 +159,11 @@ public class ReactiveRocketChatClientImpl implements ReactiveRocketChatClient {
                 .flatMap(response -> {
                   if (response.statusCode() == HttpStatus.UNAUTHORIZED) {
                     return resetSecurityContext()
-                        .flatMap(context2 -> withSecurityHeaders(requestProvider, context2)
-                            .retrieve().bodyToMono(replyClass));
+                        .flatMap(context2 -> {
+                          final WebClient.ResponseSpec spec = withSecurityHeaders(requestProvider, context2).retrieve();
+                          return replyType.isParametrized() ? spec.bodyToMono(replyType.getTypeReference())
+                              : spec.bodyToMono(replyType.getType());
+                        });
                   }
                   if (response.statusCode().is4xxClientError()) {
                     return Mono.error(new ClientHttpException(response));
@@ -158,7 +171,8 @@ public class ReactiveRocketChatClientImpl implements ReactiveRocketChatClient {
                   if (response.statusCode().is5xxServerError()) {
                     return Mono.error(new ServerHttpException(response));
                   }
-                  return response.bodyToMono(replyClass);
+                  return replyType.isParametrized() ? response.bodyToMono(replyType.getTypeReference())
+                      : response.bodyToMono(replyType.getType());
                 }));
   }
 
@@ -206,6 +220,36 @@ public class ReactiveRocketChatClientImpl implements ReactiveRocketChatClient {
           .forEach((name, values) -> values.forEach(value -> log.info(">>> {}={}", name, value)));
       return next.exchange(clientRequest);
     };
+  }
+
+  private static class ReplyType<T> {
+    private final Class<T> type;
+    private final ParameterizedTypeReference<T> typeReference;
+
+    private ReplyType(Class<T> type, ParameterizedTypeReference<T> typeReference) {
+      this.type = type;
+      this.typeReference = typeReference;
+    }
+
+    static <T> ReplyType<T> of(Class<T> type) {
+      return new ReplyType<>(type, null);
+    }
+
+    static <T> ReplyType<T> of(ParameterizedTypeReference<T> type) {
+      return new ReplyType<>(null, type);
+    }
+
+    private boolean isParametrized() {
+      return this.typeReference != null;
+    }
+
+    private Class<T> getType() {
+      return type;
+    }
+
+    private ParameterizedTypeReference<T> getTypeReference() {
+      return typeReference;
+    }
   }
 
 }

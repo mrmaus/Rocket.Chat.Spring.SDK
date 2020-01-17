@@ -1,7 +1,9 @@
 package rocketchat.spring.rest;
 
 import reactor.core.publisher.Mono;
+import rocketchat.spring.model.IdOrName;
 import rocketchat.spring.rest.messages.*;
+import rocketchat.spring.rest.messages.reply.RoomInfoReply;
 
 /**
  * The default implementation of {@link RocketChatClient} is merely a wrapper around reactive client with blocking
@@ -23,6 +25,11 @@ public class RocketChatClientImpl implements RocketChatClient {
   @Override
   public ChannelReply channelInfo(ChannelInfo info) {
     return reactiveClient.channelInfo(info).block();
+  }
+
+  @Override
+  public RoomInfoReply roomInfo(IdOrName s) {
+    return reactiveClient.roomInfo(s).block();
   }
 
   @Override

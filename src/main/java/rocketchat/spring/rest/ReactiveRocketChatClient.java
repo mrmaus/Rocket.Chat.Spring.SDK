@@ -1,7 +1,9 @@
 package rocketchat.spring.rest;
 
 import reactor.core.publisher.Mono;
+import rocketchat.spring.model.IdOrName;
 import rocketchat.spring.rest.messages.*;
+import rocketchat.spring.rest.messages.reply.RoomInfoReply;
 
 /**
  * RocketChat REST API client based on reactive api
@@ -21,6 +23,11 @@ public interface ReactiveRocketChatClient {
    * https://rocket.chat/docs/developer-guides/rest-api/channels/info/
    */
   Mono<ChannelReply> channelInfo(ChannelInfo info);
+
+  /**
+   * https://rocket.chat/docs/developer-guides/rest-api/rooms/info/
+   */
+  Mono<RoomInfoReply> roomInfo(IdOrName token);
 
   /**
    * Retrieves user details
