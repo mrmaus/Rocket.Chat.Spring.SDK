@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import rocketchat.spring.model.RoomType;
 import rocketchat.spring.ws.JsonUtils;
 
+import static rocketchat.spring.ws.JsonUtils.getText;
+
 /**
  * Bridges RocketChat WebSocket JSON responses and {@link RocketChatEvent} instances
  */
@@ -13,7 +15,7 @@ public class Events {
    * Attempts to create corresponding {@link RocketChatEvent} instance for the provided payload. Might return NULL
    */
   public static RocketChatEvent parse(JsonNode json) {
-    final String collection = JsonUtils.getText(json, "collection");
+    final String collection = getText(json, "collection");
 
     if (collection != null) {
       switch (collection) {
@@ -27,15 +29,21 @@ public class Events {
                 .roomId(msgArgs.get("rid").asText())
                 .message(msgArgs.get("msg").asText())
                 .user(new MessageEvent.User(
-                    JsonUtils.getText(msgArgs.get("u"), "username"),
-                    JsonUtils.getText(msgArgs.get("u"), "name")));
+                    getText(msgArgs.get("u"), "username"),
+                    getText(msgArgs.get("u"), "name")));
+
+            if (msgArgs.hasNonNull("mentions")) {
+              msgArgs.get("mentions").forEach(n -> {
+                builder.addMention(new UserAwareEvent.User(getText(n, "username"), getText(n, "name")));
+              });
+            }
 
             if (argsNode.size() > 1) {
               final JsonNode roomArgs = argsNode.get(1);
               builder
                   .roomParticipant(roomArgs.get("roomParticipant").booleanValue())
-                  .roomType(RoomType.parse(JsonUtils.getText(roomArgs, "roomType")))
-                  .roomName(JsonUtils.getText(roomArgs, "roomName"));
+                  .roomType(RoomType.parse(getText(roomArgs, "roomType")))
+                  .roomName(getText(roomArgs, "roomName"));
             }
             return builder.build();
           }
@@ -44,10 +52,10 @@ public class Events {
         case "stream-notify-user": {
           final JsonNode args = JsonUtils.navigate(json, "fields", "args");
 
-          final String eventName = JsonUtils.getText(json.get("fields"), "eventName");
+          final String eventName = getText(json.get("fields"), "eventName");
           if (eventName.endsWith("/subscriptions-changed")) {
             final String type = args.get(0).asText();
-            final String roomId = JsonUtils.getText(args.get(1), "rid");
+            final String roomId = getText(args.get(1), "rid");
 
             switch (type) {
               case "changed":

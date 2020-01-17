@@ -2,6 +2,10 @@ package rocketchat.spring.ws.events;
 
 import rocketchat.spring.model.RoomType;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Incoming chat message event
  */
@@ -13,19 +17,22 @@ public class MessageEvent implements UserAwareEvent {
   private final boolean roomParticipant;
   private final RoomType roomType;
   private final String roomName;
+  private final List<User> mentions;
 
   private MessageEvent(String roomId,
                        String message,
                        User user,
                        boolean roomParticipant,
                        RoomType roomType,
-                       String roomName) {
+                       String roomName,
+                       List<User> mentions) {
     this.roomId = roomId;
     this.message = message;
     this.user = user;
     this.roomParticipant = roomParticipant;
     this.roomType = roomType;
     this.roomName = roomName;
+    this.mentions = mentions;
   }
 
   public String getRoomId() {
@@ -52,8 +59,21 @@ public class MessageEvent implements UserAwareEvent {
     return roomName;
   }
 
+  public List<User> getMentions() {
+    return mentions == null ? Collections.emptyList() : mentions;
+  }
+
+  /**
+   * @return true if user with provided login is mentioned in this message; false otherwise
+   */
+  public boolean isMentioned(String login) {
+    if (this.mentions == null || login == null) {
+      return false;
+    }
+    return this.mentions.stream().anyMatch(u -> u != null && login.equals(u.getLogin()));
+  }
+
   //todo; timestamp
-  //todo: mentions
 
   @Override
   public String toString() {
@@ -71,6 +91,7 @@ public class MessageEvent implements UserAwareEvent {
     private boolean roomParticipant = true;
     private RoomType roomType = RoomType.UNKNOWN;
     private String roomName;
+    private List<User> mentions;
 
     public MessageEvent build() {
       return new MessageEvent(
@@ -79,7 +100,8 @@ public class MessageEvent implements UserAwareEvent {
           user,
           roomParticipant,
           roomType,
-          roomName);
+          roomName,
+          mentions);
     }
 
     public Builder roomId(String roomId) {
@@ -109,6 +131,14 @@ public class MessageEvent implements UserAwareEvent {
 
     public Builder roomName(String roomName) {
       this.roomName = roomName;
+      return this;
+    }
+
+    public Builder addMention(User user) {
+      if (this.mentions == null) {
+        this.mentions = new LinkedList<>();
+      }
+      this.mentions.add(user);
       return this;
     }
   }
