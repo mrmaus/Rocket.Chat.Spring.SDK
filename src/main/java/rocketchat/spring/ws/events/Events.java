@@ -30,7 +30,8 @@ public class Events {
                 .message(msgArgs.get("msg").asText())
                 .user(new MessageEvent.User(
                     getText(msgArgs.get("u"), "username"),
-                    getText(msgArgs.get("u"), "name")));
+                    getText(msgArgs.get("u"), "name")))
+                .messageType(MessageEvent.MessageType.parse(getText(msgArgs, "t")));
 
             if (msgArgs.hasNonNull("mentions")) {
               msgArgs.get("mentions").forEach(n -> {

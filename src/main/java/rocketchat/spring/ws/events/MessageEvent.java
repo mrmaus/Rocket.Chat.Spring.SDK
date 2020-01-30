@@ -16,6 +16,7 @@ public class MessageEvent implements UserAwareEvent {
   private final User user;
   private final boolean roomParticipant;
   private final RoomType roomType;
+  private final MessageType messageType;
   private final String roomName;
   private final List<User> mentions;
 
@@ -24,6 +25,7 @@ public class MessageEvent implements UserAwareEvent {
                        User user,
                        boolean roomParticipant,
                        RoomType roomType,
+                       MessageType messageType,
                        String roomName,
                        List<User> mentions) {
     this.roomId = roomId;
@@ -31,6 +33,7 @@ public class MessageEvent implements UserAwareEvent {
     this.user = user;
     this.roomParticipant = roomParticipant;
     this.roomType = roomType;
+    this.messageType = messageType;
     this.roomName = roomName;
     this.mentions = mentions;
   }
@@ -53,6 +56,10 @@ public class MessageEvent implements UserAwareEvent {
 
   public RoomType getRoomType() {
     return roomType;
+  }
+
+  public MessageType getMessageType() {
+    return messageType;
   }
 
   public String getRoomName() {
@@ -79,6 +86,7 @@ public class MessageEvent implements UserAwareEvent {
   public String toString() {
     return "MessageEvent{" +
         "roomId='" + roomId + '\'' +
+        ", messageType='" + messageType + '\'' +
         ", message='" + message + '\'' +
         ", user=" + user +
         '}';
@@ -90,6 +98,7 @@ public class MessageEvent implements UserAwareEvent {
     private User user;
     private boolean roomParticipant = true;
     private RoomType roomType = RoomType.UNKNOWN;
+    private MessageType messageType;
     private String roomName;
     private List<User> mentions;
 
@@ -100,6 +109,7 @@ public class MessageEvent implements UserAwareEvent {
           user,
           roomParticipant,
           roomType,
+          messageType,
           roomName,
           mentions);
     }
@@ -129,6 +139,11 @@ public class MessageEvent implements UserAwareEvent {
       return this;
     }
 
+    public Builder messageType(MessageType messageType) {
+      this.messageType = messageType;
+      return this;
+    }
+
     public Builder roomName(String roomName) {
       this.roomName = roomName;
       return this;
@@ -142,4 +157,30 @@ public class MessageEvent implements UserAwareEvent {
       return this;
     }
   }
+
+  public static enum MessageType {
+    USER_JOINED_CHANNEL("uj"),
+    USER_LEFT("ul"),
+    USER_ADDED_BY("au"),
+    ROOM_NAME_CHANGED("r"),
+    USER_REMOVED_BY("ru"),
+    WELCOME("wm"),
+    CONVERSATION_FINISHED("livechat-close");
+
+    private final String value;
+
+    MessageType(String value) {
+      this.value = value;
+    }
+
+    static MessageType parse(String s) {
+      for (MessageType type : values()) {
+        if (type.value.equals(s)) {
+          return type;
+        }
+      }
+      return null;
+    }
+  }
+
 }
