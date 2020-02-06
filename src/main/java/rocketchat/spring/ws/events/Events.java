@@ -31,7 +31,9 @@ public class Events {
                 .user(new MessageEvent.User(
                     getText(msgArgs.get("u"), "username"),
                     getText(msgArgs.get("u"), "name")))
-                .messageType(MessageEvent.MessageType.parse(getText(msgArgs, "t")));
+                .messageType(MessageEvent.MessageType.parse(getText(msgArgs, "t")))
+                .threadMessageId(getText(msgArgs, "tmid"))
+                .threadMessagesCount(getText(msgArgs, "tcount"));
 
             if (msgArgs.hasNonNull("mentions")) {
               msgArgs.get("mentions").forEach(n -> {

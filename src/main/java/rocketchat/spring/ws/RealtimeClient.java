@@ -40,6 +40,11 @@ public interface RealtimeClient {
   void sendMessage(String roomId, String message);
 
   /**
+   * Send message to the message thread
+   */
+  void sendThreadMessage(String roomId, String threadMessageId, String message);
+
+  /**
    * Starts listening for the room messages stream. Optional subscriptionId callback receives the stream ID, which can
    * be user later to cancel stream with {@link #cancelStream(String)}
    */

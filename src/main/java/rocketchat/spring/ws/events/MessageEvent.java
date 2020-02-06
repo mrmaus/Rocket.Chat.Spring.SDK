@@ -12,7 +12,22 @@ import java.util.List;
 public class MessageEvent implements UserAwareEvent {
 
   private final String roomId;
+
+  /**
+   * The message (ID) that started the thread. Will have value set only if this message is part of a thread, typically a
+   * reply within thread. Also the value is set only on the 'child' messages of the thread, never on the initial
+   * message
+   */
+  private final String threadMessageId;
+
+  /**
+   * The number of 'child' messages within the thread. The value will be set only on the initial thread message and will
+   * be incremented with each new child message
+   */
+  private final String threadMessagesCount;
+
   private final String message;
+
   private final User user;
   private final boolean roomParticipant;
   private final RoomType roomType;
@@ -21,6 +36,8 @@ public class MessageEvent implements UserAwareEvent {
   private final List<User> mentions;
 
   private MessageEvent(String roomId,
+                       String threadMessageId,
+                       String threadMessagesCount,
                        String message,
                        User user,
                        boolean roomParticipant,
@@ -29,6 +46,8 @@ public class MessageEvent implements UserAwareEvent {
                        String roomName,
                        List<User> mentions) {
     this.roomId = roomId;
+    this.threadMessageId = threadMessageId;
+    this.threadMessagesCount = threadMessagesCount;
     this.message = message;
     this.user = user;
     this.roomParticipant = roomParticipant;
@@ -40,6 +59,14 @@ public class MessageEvent implements UserAwareEvent {
 
   public String getRoomId() {
     return roomId;
+  }
+
+  public String getThreadMessageId() {
+    return threadMessageId;
+  }
+
+  public String getThreadMessagesCount() {
+    return threadMessagesCount;
   }
 
   public String getMessage() {
@@ -80,6 +107,21 @@ public class MessageEvent implements UserAwareEvent {
     return this.mentions.stream().anyMatch(u -> u != null && login.equals(u.getLogin()));
   }
 
+  /**
+   * @return true if this message is the initial message of the thread. As more messages are added to the thread the
+   * parent message entity also keeps changing and server sends these change notifications too
+   */
+  public boolean isThreadInitialMessage() {
+    return this.threadMessagesCount != null;
+  }
+
+  /**
+   * @return true if this message is a reply within message thread (not the thread initial message)
+   */
+  public boolean isThreadChildMessage() {
+    return this.threadMessageId != null;
+  }
+
   //todo; timestamp
 
   @Override
@@ -94,6 +136,8 @@ public class MessageEvent implements UserAwareEvent {
 
   public static class Builder {
     private String roomId;
+    private String threadMessageId;
+    private String threadMessagesCount;
     private String message;
     private User user;
     private boolean roomParticipant = true;
@@ -105,6 +149,8 @@ public class MessageEvent implements UserAwareEvent {
     public MessageEvent build() {
       return new MessageEvent(
           roomId,
+          threadMessageId,
+          threadMessagesCount,
           message,
           user,
           roomParticipant,
@@ -116,6 +162,16 @@ public class MessageEvent implements UserAwareEvent {
 
     public Builder roomId(String roomId) {
       this.roomId = roomId;
+      return this;
+    }
+
+    public Builder threadMessageId(String threadMessageId) {
+      this.threadMessageId = threadMessageId;
+      return this;
+    }
+
+    public Builder threadMessagesCount(String threadMessagesCount) {
+      this.threadMessagesCount = threadMessagesCount;
       return this;
     }
 

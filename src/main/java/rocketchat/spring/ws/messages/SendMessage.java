@@ -1,15 +1,11 @@
 package rocketchat.spring.ws.messages;
 
-import java.util.HashMap;
+import rocketchat.spring.ws.MessageObject;
 
-class SendMessage extends MethodCall {
+public class SendMessage extends MethodCall {
 
-  SendMessage(String roomId, String message) {
-    final HashMap<Object, Object> p = new HashMap<>();
-    p.put("rid", roomId);
-    p.put("msg", message);
-
+  public SendMessage(MessageObject messageObject) {
     setMethod("sendMessage");
-    setParams(new Object[]{p});
+    setParams(new Object[]{messageObject});
   }
 }

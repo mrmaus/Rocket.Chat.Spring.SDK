@@ -1,12 +1,12 @@
 package rocketchat.spring.ws;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.reactive.socket.client.WebSocketClient;
 import rocketchat.spring.ClientProperties;
 import rocketchat.spring.model.Subscription;
 import rocketchat.spring.ws.messages.Messages;
 import rocketchat.spring.ws.messages.Parsers;
+import rocketchat.spring.ws.messages.SendMessage;
 import rocketchat.spring.ws.messages.TypingMessage;
 
 import java.util.function.Consumer;
@@ -31,7 +31,19 @@ public class RealtimeClientImpl extends ReactiveRealtimeClient {
 
   @Override
   public void sendMessage(String roomId, String message) {
-    send(Messages.sendTextMessage(roomId, message));
+    final MessageObject obj = new MessageObject();
+    obj.setMsg(message);
+    obj.setRid(roomId);
+    send(new SendMessage(obj));
+  }
+
+  @Override
+  public void sendThreadMessage(String roomId, String threadMessageId, String message) {
+    final MessageObject obj = new MessageObject();
+    obj.setMsg(message);
+    obj.setRid(roomId);
+    obj.setTmid(threadMessageId);
+    send(new SendMessage(obj));
   }
 
   @Override

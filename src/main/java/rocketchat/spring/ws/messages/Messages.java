@@ -44,14 +44,6 @@ public class Messages {
   }
 
   /**
-   * Send simple text message into specified room
-   */
-  public static Message sendTextMessage(String roomId, String message) {
-    return new SendMessage(roomId, message);
-  }
-
-
-  /**
    * Request messages stream from the specified room. Once requested (and bot user can access the room), the bot will
    * start receiving all posted messages within the room
    */
