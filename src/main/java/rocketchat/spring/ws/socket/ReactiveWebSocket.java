@@ -109,7 +109,7 @@ public class ReactiveWebSocket implements WebSocket {
       final Mono<Object> disconnected = Mono.fromRunnable(() -> {
         webSocketConnected = false;
         callback.disconnected(session.getId());
-      });
+      }).subscribeOn(Schedulers.elastic());
 
       return connected
           .thenMany(receive)

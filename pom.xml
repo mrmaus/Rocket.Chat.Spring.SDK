@@ -6,9 +6,9 @@
   <groupId>rocketchat</groupId>
   <artifactId>rocketchat-spring-sdk</artifactId>
 
-  <version>0.9</version>
+  <version>0.10</version>
   <name>RocketChat SpringBoot SDK</name>
-  <description>todo:</description>
+  <description>Spring Webflux based RocketChat SDK</description>
 
   <properties>
     <maven.compiler.target>1.8</maven.compiler.target>
