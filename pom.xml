@@ -6,15 +6,15 @@
   <groupId>rocketchat</groupId>
   <artifactId>rocketchat-spring-sdk</artifactId>
 
-  <version>0.10</version>
+  <version>0.11</version>
   <name>RocketChat SpringBoot SDK</name>
   <description>Spring Webflux based RocketChat SDK</description>
 
   <properties>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
-    <spring-boot.version>2.1.9.RELEASE</spring-boot.version>
-    <spring.version>5.1.10.RELEASE</spring.version>
+    <spring-boot.version>2.2.0.RELEASE</spring-boot.version>
+    <spring.version>5.2.0.RELEASE</spring.version>
   </properties>
 
   <dependencies>
