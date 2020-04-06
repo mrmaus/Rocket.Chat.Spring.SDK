@@ -34,6 +34,7 @@ public class MessageEvent implements UserAwareEvent {
   private final MessageType messageType;
   private final String roomName;
   private final List<User> mentions;
+  private final String editedAt;
 
   private MessageEvent(String roomId,
                        String threadMessageId,
@@ -44,7 +45,8 @@ public class MessageEvent implements UserAwareEvent {
                        RoomType roomType,
                        MessageType messageType,
                        String roomName,
-                       List<User> mentions) {
+                       List<User> mentions,
+                       String editedAt) {
     this.roomId = roomId;
     this.threadMessageId = threadMessageId;
     this.threadMessagesCount = threadMessagesCount;
@@ -55,6 +57,7 @@ public class MessageEvent implements UserAwareEvent {
     this.messageType = messageType;
     this.roomName = roomName;
     this.mentions = mentions;
+    this.editedAt = editedAt;
   }
 
   public String getRoomId() {
@@ -97,6 +100,8 @@ public class MessageEvent implements UserAwareEvent {
     return mentions == null ? Collections.emptyList() : mentions;
   }
 
+  public String getEditedAt() { return editedAt; }
+
   /**
    * @return true if user with provided login is mentioned in this message; false otherwise
    */
@@ -122,6 +127,8 @@ public class MessageEvent implements UserAwareEvent {
     return this.threadMessageId != null;
   }
 
+  public boolean wasEdited() { return this.editedAt != null; }
+
   //todo; timestamp
 
   @Override
@@ -145,6 +152,7 @@ public class MessageEvent implements UserAwareEvent {
     private MessageType messageType;
     private String roomName;
     private List<User> mentions;
+    private String editedAt;
 
     public MessageEvent build() {
       return new MessageEvent(
@@ -157,7 +165,8 @@ public class MessageEvent implements UserAwareEvent {
           roomType,
           messageType,
           roomName,
-          mentions);
+          mentions,
+          editedAt);
     }
 
     public Builder roomId(String roomId) {
@@ -210,6 +219,11 @@ public class MessageEvent implements UserAwareEvent {
         this.mentions = new LinkedList<>();
       }
       this.mentions.add(user);
+      return this;
+    }
+
+    public Builder editedAt(String editedAt) {
+      this.editedAt = editedAt;
       return this;
     }
   }
