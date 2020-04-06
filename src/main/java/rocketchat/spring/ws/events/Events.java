@@ -34,7 +34,7 @@ public class Events {
                 .messageType(MessageEvent.MessageType.parse(getText(msgArgs, "t")))
                 .threadMessageId(getText(msgArgs, "tmid"))
                 .threadMessagesCount(getText(msgArgs, "tcount"))
-                .editedAt(msgArgs.get("editedAt").asText());
+                .editedAt(getText(msgArgs, "editedAt"));
 
             if (msgArgs.hasNonNull("mentions")) {
               msgArgs.get("mentions").forEach(n -> {
