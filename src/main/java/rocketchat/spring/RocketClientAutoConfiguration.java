@@ -59,6 +59,7 @@ public class RocketClientAutoConfiguration {
   @ConditionalOnMissingBean
   public RealtimeClient realtimeClient(RealtimeExecutorFactory realtimeExecutorFactory) {
     final ReactorNettyWebSocketClient webSocketClient = new ReactorNettyWebSocketClient(httpClient());
+    webSocketClient.setMaxFramePayloadLength(properties.getMaxFrameSize());
     return new RealtimeClientImpl(webSocketClient, properties, context, realtimeExecutorFactory);
   }
 

@@ -42,6 +42,11 @@ public class ClientProperties {
    */
   private boolean subscriptionManagerEnabled = false;
 
+  /**
+   * Websocket max frame payload size; see {@link org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient#setMaxFramePayloadLength(int)}
+   */
+  private int maxFrameSize = 64 * 1024;
+
   public String getBaseUrl() {
     return baseUrl;
   }
@@ -62,6 +67,10 @@ public class ClientProperties {
     return password;
   }
 
+  public int getMaxFrameSize() {
+    return maxFrameSize;
+  }
+
   public void setPassword(String password) {
     this.password = password;
   }
@@ -80,6 +89,10 @@ public class ClientProperties {
 
   public void setSubscriptionManagerEnabled(boolean subscriptionManagerEnabled) {
     this.subscriptionManagerEnabled = subscriptionManagerEnabled;
+  }
+
+  public void setMaxFrameSize(int maxFrameSize) {
+    this.maxFrameSize = maxFrameSize;
   }
 
   public URI webSocketUri() {

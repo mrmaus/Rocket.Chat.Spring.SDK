@@ -1,0 +1,34 @@
+{
+  "msg": "changed",
+  "collection": "stream-room-messages",
+  "id": "id",
+  "fields": {
+    "eventName": "__my_messages__",
+    "args": [
+      [
+        {
+          "_id": "iKdK9z7PpPohrms7M",
+          "rid": "2NuH67xdSSrAE6eKumhDGoZxTDMaYJ23p5",
+          "msg": "hi",
+          "ts": {
+            "$date": 1614590326254
+          },
+          "u": {
+            "_id": "2NuH67xdSSrAE6eKu",
+            "username": "admin",
+            "name": "Administrator"
+          },
+          "_updatedAt": {
+            "$date": 1614590326300
+          },
+          "mentions": [],
+          "channels": []
+        }
+      ],
+      {
+        "roomParticipant": true,
+        "roomType": "d"
+      }
+    ]
+  }
+}

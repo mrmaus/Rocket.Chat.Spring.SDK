@@ -23,7 +23,10 @@ public class Events {
           final JsonNode argsNode = JsonUtils.navigate(json, "fields", "args");
 
           if (argsNode.size() > 0) {
-            final JsonNode msgArgs = argsNode.get(0);
+            JsonNode msgArgs = argsNode.get(0);
+            if (msgArgs.isArray()) { // in some cases args are packed into double array
+              msgArgs = msgArgs.get(0);
+            }
 
             final MessageEvent.Builder builder = new MessageEvent.Builder()
                 .roomId(msgArgs.get("rid").asText())
